@@ -1,19 +1,23 @@
 const express = require('express');
 
-const error = require('./error');
-const city = require('./city');
-const signup = require('./signup');
-const login = require('./login');
-
+const { client, server } = require('./error');
+const { getAllCities, renderCities, add } = require('./city');
+const { renderSignup, postSignUp } = require('./signup');
+const { postLogin, renderLogin } = require('./login');
+const { isAuth } = require('./auth');
+const { logout } = require('./logout');
 const router = express.Router();
 
-router.get('/login', login.renderLogin);
-router.get('/signup', signup.renderSignup);
-router.get('/cities', city.renderCities);
-router.get('/all-cities', city.getAllCities);
-router.post('/add-city', city.add);
+router.use(isAuth);
+router.route('/login').get(renderLogin).post(postLogin);
+router.route('/signup').get(renderSignup).post(postSignUp);
 
-router.use(error.client);
-router.use(error.server);
+router.get('/cities', renderCities);
+router.get('/all-cities', getAllCities);
+router.post('/add-city', add);
+router.get('/logout', logout);
+
+router.use(client);
+router.use(server);
 
 module.exports = router;
